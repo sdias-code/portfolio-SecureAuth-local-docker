@@ -1,7 +1,7 @@
 # SecureAuth API
 
-> 🚀 Projeto de autenticação JWT + Refresh Token pronto para produção, com Docker e PostgreSQL.
-> 🔹 Estrutura Clean Architecture, .NET 8 LTS, pronto para portfólio profissional.
+ - Projeto de autenticação JWT + Refresh Token pronto para produção, com Docker e PostgreSQL.
+ - Estrutura Clean Architecture, .NET 8 LTS, pronto para portfólio profissional.
 
 ---
 
