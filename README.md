@@ -1,7 +1,11 @@
 # SecureAuth API
 
  - Projeto de autenticação JWT + Refresh Token pronto para produção, com Docker e PostgreSQL.
- - Estrutura Clean Architecture, .NET 8 LTS, pronto para portfólio profissional.
+ - Estrutura Clean Architecture, .NET 8 LTS
+
+## 🎯 Objetivo
+
+Demonstrar capacidade técnica no desenvolvimento de APIs modernas e seguras utilizando .NET 8, aplicando boas práticas de arquitetura, autenticação e containerização. 
 
 ---
 
@@ -18,8 +22,6 @@ SecureAuth API é uma API de autenticação moderna, construída para demonstrar
 * Health checks
 * Docker-ready (PostgreSQL + PGAdmin)
 * Swagger para documentação e testes
-
-Ideal para **freelas backend, portfólio ou base para produto real**.
 
 ---
 
