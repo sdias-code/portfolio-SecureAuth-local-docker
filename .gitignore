@@ -1,0 +1,112 @@
+## =========================
+## .NET & Visual Studio
+## =========================
+
+# User-specific
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+*.DotSettings.user
+
+# Build output
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Dd]ebug*/
+[Rr]elease*/
+x64/
+x86/
+bld/
+artifacts/
+
+# VS cache
+.vs/
+*.VC.db
+*.VC.VC.opendb
+ipch/
+
+# Run settings
+**/Properties/launchSettings.json
+
+# =========================
+## Test & Coverage
+## =========================
+
+[Tt]est[Rr]esult*/
+*.coverage
+*.coveragexml
+*.trx
+*.VisualState.xml
+
+# Benchmark
+BenchmarkDotNet.Artifacts/
+
+# =========================
+## NuGet
+## =========================
+
+*.nupkg
+**/packages/*
+!**/packages/build/
+.nuget/
+*.nuget.props
+*.nuget.targets
+
+# =========================
+## Publish / Deploy
+## =========================
+
+*.azurePubxml
+*.pubxml
+*.publishproj
+PublishScripts/
+*.publishsettings
+publish/
+
+# =========================
+## Logs & Temp Files
+## =========================
+
+*.log
+logs/
+*.cache
+*.pdb
+*.tmp
+*.bak
+*.swp
+*~
+
+# =========================
+## Database
+## =========================
+
+*.mdf
+*.ldf
+*.ndf
+
+# =========================
+## Docker
+## =========================
+
+docker-compose.override.yml
+**/docker-compose.override.yml
+
+# Opcional (caso use):
+*.dockerfile.local
+
+# =========================
+## Environment variables
+## =========================
+
+.env
+.env.*
+!.env.example
+
+# =========================
+## OS Files
+## =========================
+
+.DS_Store
+Thumbs.db

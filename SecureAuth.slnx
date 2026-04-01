@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SecureAuth.API/SecureAuth.API.csproj" />
+    <Project Path="src/SecureAuth.Application/SecureAuth.Application.csproj" />
+    <Project Path="src/SecureAuth.Domain/SecureAuth.Domain.csproj" />
+    <Project Path="src/SecureAuth.Infrastructure/SecureAuth.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SecureAuth.IntegrationTests/SecureAuth.IntegrationTests.csproj" />
+    <Project Path="tests/SecureAuth.UnitTests/SecureAuth.UnitTests.csproj" />
+  </Folder>
+</Solution>
