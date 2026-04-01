@@ -1,27 +1,51 @@
-# SecureAuth API
+# 🚀 SecureAuth API
 
- - Projeto de autenticação JWT + Refresh Token pronto para produção, com Docker e PostgreSQL.
- - Estrutura Clean Architecture, .NET 8 LTS
+![.NET](https://img.shields.io/badge/.NET-8-blue)
+![Docker](https://img.shields.io/badge/Docker-Ready-blue)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue)
+![License](https://img.shields.io/badge/License-MIT-green)
+
+> API de autenticação moderna com JWT + Refresh Token, construída com .NET 8, Clean Architecture e Docker.
+
+---
 
 ## 🎯 Objetivo
 
-Demonstrar capacidade técnica no desenvolvimento de APIs modernas e seguras utilizando .NET 8, aplicando boas práticas de arquitetura, autenticação e containerização. 
+Demonstrar capacidade técnica no desenvolvimento de APIs modernas e seguras utilizando .NET 8, aplicando boas práticas de arquitetura, autenticação e containerização.
 
 ---
 
 ## 💡 Sobre o Projeto
 
-SecureAuth API é uma API de autenticação moderna, construída para demonstrar nível pleno/avançado em .NET:
+SecureAuth API é uma API de autenticação pronta para produção, com foco em segurança, escalabilidade e boas práticas de mercado:
 
-* Autenticação JWT + Refresh Token
-* Registro, login, refresh token e logout
-* CQRS com MediatR
-* Clean Architecture
-* Logging com Serilog
-* Rate limiting
-* Health checks
-* Docker-ready (PostgreSQL + PGAdmin)
-* Swagger para documentação e testes
+* 🔐 Autenticação JWT + Refresh Token
+* 👤 Registro, login e logout
+* 🔄 Rotação segura de Refresh Token
+* 🧠 CQRS com MediatR
+* 🏗 Clean Architecture
+* 📊 Logging com Serilog
+* 🚦 Rate limiting
+* ❤️ Health checks
+* 🐳 Docker + PostgreSQL + PGAdmin
+* 📄 Swagger (OpenAPI)
+
+---
+
+## 🧠 Arquitetura
+
+O projeto segue **Clean Architecture + CQRS**, utilizando MediatR para desacoplamento:
+
+```text
+Controller → IMediator → Command/Query → Handler → Repository
+```
+
+### Benefícios
+
+* Baixo acoplamento
+* Alta testabilidade
+* Separação clara de responsabilidades
+* Facilidade de manutenção
 
 ---
 
@@ -31,19 +55,10 @@ SecureAuth API é uma API de autenticação moderna, construída para demonstrar
 * C# 12
 * Entity Framework Core
 * PostgreSQL 16
-* PGAdmin 9
 * Docker + Docker Compose
 * Swagger / OpenAPI
 * Serilog
-* Rate Limiting Middleware
-
----
-
-## ⚙ Pré-requisitos
-
-* .NET 8 SDK
-* Docker
-* Docker Compose
+* MediatR
 
 ---
 
@@ -68,25 +83,21 @@ project-root
 
 ## ⚙ Configuração do `.env`
 
-Crie um arquivo `.env` na raiz do projeto com:
+Crie um arquivo `.env` na raiz:
 
 ```env
-# Postgres
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=postgres
 POSTGRES_DB=secureauth
 
-# PGADMIN
 PGADMIN_EMAIL=demo@example.com
 PGADMIN_PASSWORD=secret
 
-# JWT
-JWT__KEY=minhasuperkeyaqui
+JWT__KEY=your_secret_key_here
 JWT__ISSUER=SecureAuth
 JWT__AUDIENCE=SecureAuthUsers
 JWT__EXPIRATION_MINUTES=60
 
-# Connection string
 ConnectionStrings__PostgresConnection=Host=postgres;Port=5432;Database=secureauth;Username=postgres;Password=postgres
 ```
 
@@ -94,61 +105,38 @@ ConnectionStrings__PostgresConnection=Host=postgres;Port=5432;Database=secureaut
 
 ## 🐳 Rodando com Docker
 
-### 1️⃣ Subir todos os containers
+### Subir ambiente
 
 ```bash
 docker-compose up -d --build
 ```
 
-### 2️⃣ Acessos
+### Acessos
 
 * API: http://localhost:5000
 * Swagger: http://localhost:5000
 * PGAdmin: http://localhost:5050
 
-### Containers
-
-| Serviço    | Porta | Observação                   |
-| ---------- | ----- | ---------------------------- |
-| PostgreSQL | 5432  | Database `secureauth`        |
-| API        | 5000  | Swagger em `/` (Development) |
-| PGAdmin    | 5050  | Gerenciamento do banco       |
-
-✔ O container da API executa automaticamente as **migrations** no PostgreSQL.
-
-### Parar e remover containers
-
-```bash
-docker-compose down -v
-```
-
 ---
 
-## 📌 Testando a API
+## 📌 Endpoints
 
-Swagger (somente em Development):
-
-```
-http://localhost:5000
-```
-
-### Endpoints principais
-
-| Método | Rota               | Descrição                     |
-| ------ | ------------------ | ----------------------------- |
-| POST   | /api/auth/register | Cadastrar usuário             |
-| POST   | /api/auth/login    | Login + JWT + Refresh Token   |
-| POST   | /api/auth/refresh  | Gerar novo JWT                |
-| POST   | /api/auth/logout   | Logout (opcional `logoutAll`) |
+| Método | Rota               | Descrição           |
+| ------ | ------------------ | ------------------- |
+| POST   | /api/auth/register | Cadastro            |
+| POST   | /api/auth/login    | Login               |
+| POST   | /api/auth/refresh  | Refresh Token       |
+| POST   | /api/auth/logout   | Logout              |
+| GET    | /api/auth/me       | Usuário autenticado |
 
 ---
 
 ## 🔐 Fluxo de Autenticação
 
-1. Registrar usuário → `/api/auth/register`
-2. Login → `/api/auth/login` → Recebe JWT + Refresh Token
-3. Refresh → `/api/auth/refresh` → Novo JWT + Refresh Token
-4. Logout → `/api/auth/logout` → Revoga refresh token
+1. Register → cria usuário
+2. Login → retorna JWT + RefreshToken
+3. Refresh → gera novo JWT
+4. Logout → revoga token
 
 ✔ Não é necessário enviar `userId` no refresh.
 
@@ -157,24 +145,17 @@ http://localhost:5000
 ## 📝 Observações
 
 * Refresh Token com rotação segura
-* Chaves de Data Protection persistidas em volume Docker (`data-protection`)
-* Rate limiting ativo em endpoints críticos
+* Persistência de chaves Data Protection via Docker volume
+* Rate limiting em endpoints críticos
 * Logging estruturado com Serilog
-
-### Rodando sem Docker
-
-```bash
-dotnet ef database update -p src/SecureAuth.API/SecureAuth.API.csproj -s src/SecureAuth.API/SecureAuth.API.csproj
-dotnet run --project src/SecureAuth.API/SecureAuth.API.csproj
-```
 
 ---
 
-## 📦 Deploy / Produção
+## 📦 Deploy
 
-* Alterar variáveis do `.env`
+* Ajustar `.env` para produção
 * Subir com Docker em servidor
-* Configurar HTTPS e certificados
+* Configurar HTTPS
 
 ---
 
