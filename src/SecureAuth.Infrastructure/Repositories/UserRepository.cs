@@ -3,45 +3,48 @@ using SecureAuth.Domain.Entities;
 using SecureAuth.Domain.Repositories;
 using SecureAuth.Infrastructure.Persistence;
 
-public class UserRepository : IUserRepository
+namespace SecureAuth.Infrastructure.Repositories
 {
-    private readonly AppDbContext _context;
 
-    public UserRepository(AppDbContext context)
+    public class UserRepository : IUserRepository
     {
-        _context = context;
-    }
+        private readonly AppDbContext _context;
 
-    public async Task<bool> ExistsByEmailAsync(string email)
-    {
-        email = email.ToLower().Trim();
+        public UserRepository(AppDbContext context)
+        {
+            _context = context;
+        }
 
-        return await _context.Users
-            .AnyAsync(x => x.Email == email);
-    }
+        public async Task<bool> ExistsByEmailAsync(string email)
+        {
+            email = email.ToLower().Trim();
 
-    public async Task<User?> GetByEmailAsync(string email)
-    {
-        email = email.ToLower().Trim();
+            return await _context.Users
+                .AnyAsync(x => x.Email == email);
+        }
 
-        return await _context.Users
-            .FirstOrDefaultAsync(x => x.Email == email);
-    }
+        public async Task<User?> GetByEmailAsync(string email)
+        {
+            email = email.ToLower().Trim();
 
-    public async Task<User?> GetByIdAsync(Guid userId)
-    {
-        return await _context.Users
-            .FirstOrDefaultAsync(x => x.Id == userId);
-    }
+            return await _context.Users
+                .FirstOrDefaultAsync(x => x.Email == email);
+        }
 
-    public async Task AddAsync(User user)
-    {
-        user.Email = user.Email.ToLower().Trim();
+        public async Task<User?> GetByIdAsync(Guid userId)
+        {
+            return await _context.Users
+                .FirstOrDefaultAsync(x => x.Id == userId);
+        }
 
-        _context.Users.Add(user);
+        public async Task AddAsync(User user)
+        {
+            user.Email = user.Email.ToLower().Trim();
 
-        await _context.SaveChangesAsync();
-    }
+            _context.Users.Add(user);
 
-   
+            await _context.SaveChangesAsync();
+        }
+
+    }  
 }

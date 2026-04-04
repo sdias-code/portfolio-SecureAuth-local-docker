@@ -1,0 +1,46 @@
+name: CI - SecureAuth
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout do código
+        uses: actions/checkout@v4
+
+      - name: 🧰 Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: 📦 Restore
+        run: dotnet restore
+
+      - name: 🏗️ Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: 🧪 Testes (Testcontainers)
+        run: dotnet test --no-build --configuration Release --logger "console;verbosity=detailed"
+
+      - name: 🔐 Login no Docker Hub
+        if: github.ref == 'refs/heads/main'
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: 🐳 Build da imagem (multi-tag)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          docker build -t sdiascode/secureauth-api:latest \
+                       -t sdiascode/secureauth-api:${{ github.sha }} \
+                       -t sdiascode/secureauth-api:${{ github.ref_name }} .
+
+      - name: 🚀 Push para Docker Hub
+        if: github.ref == 'refs/heads/main'
+        run: |
+          docker push sdiascode/secureauth-api:latest
+          docker push sdiascode/secureauth-api:${{ github.sha }}

@@ -12,6 +12,7 @@ using SecureAuth.Application.Security.Services;
 using SecureAuth.Domain.Repositories;
 using SecureAuth.Infrastructure.Identity;
 using SecureAuth.Infrastructure.Persistence;
+using SecureAuth.Infrastructure.Repositories;
 
 public static class DependencyInjectionConfig
 {

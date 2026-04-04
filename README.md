@@ -4,6 +4,7 @@
 ![Docker](https://img.shields.io/badge/Docker-Ready-blue)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
+![CI](https://github.com/sdias-code/portfolio-SecureAuth-local-docker/actions/workflows/ci.yml/badge.svg)
 
 > API de autenticação moderna com JWT + Refresh Token, construída com .NET 8, Clean Architecture e Docker.
 
