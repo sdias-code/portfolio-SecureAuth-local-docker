@@ -11,10 +11,7 @@ namespace SecureAuth.IntegrationTests.Factory
                 .UseNpgsql(connectionString)
                 .Options;
 
-            var context = new AppDbContext(options);
-
-            // Ensure the database is created and apply migrations
-            await context.Database.MigrateAsync();
+            var context = new AppDbContext(options);            
 
             return context;
         }
