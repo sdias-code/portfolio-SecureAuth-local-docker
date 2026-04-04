@@ -5,7 +5,7 @@ namespace SecureAuth.IntegrationTests.Factory
 {
     public static class DbContextFactory
     {
-        public static AppDbContext Create(string connectionString)
+        public static async Task<AppDbContext> CreateAsync(string connectionString)
         {
             var options = new DbContextOptionsBuilder<AppDbContext>()
                 .UseNpgsql(connectionString)
@@ -13,7 +13,8 @@ namespace SecureAuth.IntegrationTests.Factory
 
             var context = new AppDbContext(options);
 
-            context.Database.Migrate(); // aplica migrations
+            // Ensure the database is created and apply migrations
+            await context.Database.MigrateAsync();
 
             return context;
         }

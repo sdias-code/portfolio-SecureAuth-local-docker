@@ -1,10 +1,10 @@
 ﻿using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using SecureAuth.Domain.Entities;
+using SecureAuth.Infrastructure.Persistence;
 using SecureAuth.Infrastructure.Repositories;
 using SecureAuth.IntegrationTests.Factory;
 using SecureAuth.IntegrationTests.Fixture;
-using SecureAuth.IntegrationTests.Helper;
 
 namespace SecureAuth.IntegrationTests.Repositories
 {
@@ -28,13 +28,20 @@ namespace SecureAuth.IntegrationTests.Repositories
             };
         }
 
+        private async Task ResetDatabase() =>
+            await _fixture.ResetDatabaseAsync();
+
+        private async Task<AppDbContext> CreateContext() =>
+            await DbContextFactory.CreateAsync(_fixture.ConnectionString);
+
+
         [Fact]
         public async Task AddAsync_ShouldPersistUser_InDatabase()
         {
             // Arrange
-            var context = DbContextFactory.Create(_fixture.ConnectionString);
+            await ResetDatabase();
 
-            await DatabaseHelper.ResetDatabaseAsync(context);
+            var context = await CreateContext();
 
             var repository = new UserRepository(context);
 
@@ -44,7 +51,7 @@ namespace SecureAuth.IntegrationTests.Repositories
             await repository.AddAsync(user);
 
             // Assert (novo contexto!)
-            var validationContext = DbContextFactory.Create(_fixture.ConnectionString);
+            var validationContext = await DbContextFactory.CreateAsync(_fixture.ConnectionString);          
 
             // importante: desabilitar tracking para garantir que estamos lendo do banco, não do cache
             validationContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
@@ -60,9 +67,9 @@ namespace SecureAuth.IntegrationTests.Repositories
         public async Task ExistsByEmailAsync_ShouldReturnTrue_WhenUserExists()
         {
             // Arrange
-            var context = DbContextFactory.Create(_fixture.ConnectionString);
+            await ResetDatabase();
 
-            await DatabaseHelper.ResetDatabaseAsync(context);
+            var context = await CreateContext();
 
             var repository = new UserRepository(context);
 
@@ -80,9 +87,9 @@ namespace SecureAuth.IntegrationTests.Repositories
         public async Task GetByIdAsync_ShouldReturnCorrectUser()
         {
             // Arrange
-            var context = DbContextFactory.Create(_fixture.ConnectionString);
+            await ResetDatabase();
 
-            await DatabaseHelper.ResetDatabaseAsync(context);
+            var context = await CreateContext();
 
             var repository = new UserRepository(context);
 
@@ -95,13 +102,15 @@ namespace SecureAuth.IntegrationTests.Repositories
             // Assert
             result.Should().NotBeNull();
             result!.Id.Should().Be(user.Id);
+            result.Email.Should().Be(user.Email);
         }
 
         [Fact]
         public async Task AddAsync_ShouldNotAllowDuplicateEmail()
         {
-            var context = DbContextFactory.Create(_fixture.ConnectionString);
-            await DatabaseHelper.ResetDatabaseAsync(context);
+            await ResetDatabase();
+
+            var context = await CreateContext();
 
             var repository = new UserRepository(context);
 
@@ -113,8 +122,22 @@ namespace SecureAuth.IntegrationTests.Repositories
             // Act
             Func<Task> act = async () => await repository.AddAsync(user2);
 
-            // Assert
-            await act.Should().ThrowAsync<Exception>(); // ideal: custom exception
+            // Assert            
+            await act.Should().ThrowAsync<DbUpdateException>();
+        }
+
+        [Fact]
+        public async Task ExistsByEmailAsync_ShouldReturnFalse_WhenUserDoesNotExist()
+        {
+            await ResetDatabase();
+
+            var context = await CreateContext();
+
+            var repository = new UserRepository(context);
+
+            var exists = await repository.ExistsByEmailAsync("notfound@test.com");
+
+            exists.Should().BeFalse();            
         }
     }
 }
