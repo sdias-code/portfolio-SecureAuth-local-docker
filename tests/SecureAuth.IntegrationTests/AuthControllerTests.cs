@@ -41,7 +41,7 @@ namespace SecureAuth.IntegrationTests
 
             var response = await _client.PostAsJsonAsync("/api/auth/register", request);
 
-            response.StatusCode.Should().Be(System.Net.HttpStatusCode.Created);
+            response.StatusCode.Should().Be(HttpStatusCode.Created);
         }
 
         [Fact]
@@ -192,11 +192,11 @@ namespace SecureAuth.IntegrationTests
         public async Task Me_ShouldReturnUnauthorized_WhenTokenInvalid()
         {
             _client.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "token-invalido");
+                new AuthenticationHeaderValue("Bearer", "token-invalido");
 
             var response = await _client.GetAsync("/api/auth/me");
 
-            response.StatusCode.Should().Be(System.Net.HttpStatusCode.Unauthorized);
+            response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         } 
 
     }

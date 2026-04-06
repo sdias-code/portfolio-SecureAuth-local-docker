@@ -6,31 +6,38 @@
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![CI](https://github.com/sdias-code/portfolio-SecureAuth-local-docker/actions/workflows/ci.yml/badge.svg)
 
+## 💼 Disponível para freelas
 
-> API de autenticação moderna com JWT + Refresh Token, construída com .NET 8, Clean Architecture e Docker.
+Este projeto demonstra minha capacidade em construir APIs seguras, escaláveis e prontas para produção.
+
+---
+
+> API de autenticação moderna com JWT + Refresh Token, construída com .NET 8, Clean Architecture e preparada para produção com Docker e CI/CD.
 
 ---
 
 ## 🎯 Objetivo
 
-Demonstrar capacidade técnica no desenvolvimento de APIs modernas e seguras utilizando .NET 8, aplicando boas práticas de arquitetura, autenticação e containerização.
+Demonstrar domínio em desenvolvimento backend com .NET, aplicando:
 
+- Arquitetura limpa (Clean Architecture)
+- Autenticação segura com JWT + Refresh Token
+- Testes automatizados com banco real
+- Containerização com Docker
+- Pipeline CI/CD com GitHub Actions
 ---
 
 ## 💡 Sobre o Projeto
 
-SecureAuth API é uma API de autenticação pronta para produção, com foco em segurança, escalabilidade e boas práticas de mercado:
+A SecureAuth API é uma solução completa de autenticação, projetada com foco em:
 
-* 🔐 Autenticação JWT + Refresh Token
-* 👤 Registro, login e logout
-* 🔄 Rotação segura de Refresh Token
-* 🧠 CQRS com MediatR
-* 🏗 Clean Architecture
-* 📊 Logging com Serilog
-* 🚦 Rate limiting
-* ❤️ Health checks
-* 🐳 Docker + PostgreSQL + PGAdmin
-* 📄 Swagger (OpenAPI)
+Funcionalidades
+- ✔ Registro de usuário
+- ✔ Login com geração de JWT
+- ✔ Refresh Token seguro (com rotação)
+- ✔ Logout individual ou global
+- ✔ Endpoint protegido (/me)
+- ✔ Rate limiting em endpoints críticos
 
 ---
 
@@ -58,11 +65,37 @@ Controller → IMediator → Command/Query → Handler → Repository
 * Entity Framework Core
 * PostgreSQL 16
 * Docker + Docker Compose
+* MediatR (CQRS)
+* Serilog (logging estruturado)
 * Swagger / OpenAPI
-* Serilog
-* MediatR
+* Rate Limiting (ASP.NET Core)
 
 ---
+
+## 🧪 Testes
+
+O projeto possui testes automatizados com foco em cenários reais:
+
+- ✔ Testes de integração com PostgreSQL real
+- ✔ Uso de Testcontainers (ambiente isolado)
+- ✔ Validação completa do fluxo de autenticação
+- ✔ Executados automaticamente via CI/CD
+
+dotnet test
+
+---
+
+## 🔄 CI/CD
+
+Pipeline configurada com GitHub Actions:
+
+- Build da aplicação
+- Execução de testes automatizados
+- Validação do ambiente Docker
+- Pronto para deploy contínuo
+
+---
+
 
 ## 📁 Estrutura do Projeto
 
@@ -98,7 +131,7 @@ PGADMIN_PASSWORD=secret
 JWT__KEY=your_secret_key_here
 JWT__ISSUER=SecureAuth
 JWT__AUDIENCE=SecureAuthUsers
-JWT__EXPIRATION_MINUTES=60
+JWT__EXPIRATIONMINUTES=60
 
 ConnectionStrings__PostgresConnection=Host=postgres;Port=5432;Database=secureauth;Username=postgres;Password=postgres
 ```
@@ -107,7 +140,7 @@ ConnectionStrings__PostgresConnection=Host=postgres;Port=5432;Database=secureaut
 
 ## 🐳 Rodando com Docker
 
-### Subir ambiente
+### Subir o ambiente completo
 
 ```bash
 docker-compose up -d --build
@@ -140,24 +173,29 @@ docker-compose up -d --build
 3. Refresh → gera novo JWT
 4. Logout → revoga token
 
-✔ Não é necessário enviar `userId` no refresh.
+✔ Não é necessário enviar `userId` no refresh
+✔ Refresh Token armazenado de forma segura (hash)
 
 ---
 
-## 📝 Observações
+## 📝 Observações Técnicas
 
 * Refresh Token com rotação segura
-* Persistência de chaves Data Protection via Docker volume
-* Rate limiting em endpoints críticos
+* Validação completa de JWT (issuer, audience, lifetime)
 * Logging estruturado com Serilog
+* Rate limiting configurado
+* Persistência de Data Protection via volume Docker
+* Pronto para uso em ambientes reais
 
 ---
 
 ## 📦 Deploy
 
-* Ajustar `.env` para produção
-* Subir com Docker em servidor
-* Configurar HTTPS
+Para produção:
+
+- Utilizar variáveis de ambiente seguras (secrets)
+- Configurar HTTPS (Nginx ou reverse proxy)
+- Ajustar parâmetros de segurança (Rate limit, logs, etc.)
 
 ---
 
