@@ -23,6 +23,11 @@ app.UseSwaggerSetup();
 app.MapControllers();
 
 // 🔹 Migrações automáticas
-app.ApplyMigrationsSafe();
+if (!app.Environment.IsEnvironment("Testing"))
+{
+    app.ApplyMigrationsSafe();
+}
 
 app.Run();
+
+public partial class Program { }

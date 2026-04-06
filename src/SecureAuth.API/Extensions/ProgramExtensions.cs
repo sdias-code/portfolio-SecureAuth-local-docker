@@ -46,7 +46,13 @@ public static class ProgramExtensions
     {
         app.UseSerilogRequestLogging();
         app.UseMiddleware<GlobalExceptionMiddleware>();
-        app.UseHttpsRedirection();
+
+        // ❌ NÃO usar HTTPS em testes
+        if (!app.Environment.IsEnvironment("Testing"))
+        {
+            app.UseHttpsRedirection();
+        }
+
         app.UseAuthentication();
         app.UseAuthorization();
         app.UseRateLimiter();
