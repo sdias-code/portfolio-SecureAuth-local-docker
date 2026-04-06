@@ -12,16 +12,14 @@ namespace SecureAuth.IntegrationTests.Fixture
     {
         private readonly PostgreSqlContainer _container;
 
-        private DbConnection _connection;
+        private DbConnection? _connection;
+        private Respawner? _respawner;
 
         public string ConnectionString => _container.GetConnectionString();
 
-        private Respawner _respawner;
-
         public PostgresContainerFixture()
         {
-            _container = new PostgreSqlBuilder()
-                .WithImage("postgres:15")
+            _container = new PostgreSqlBuilder("postgres:15")
                 .WithDatabase("secureauth_test")
                 .WithUsername("postgres")
                 .WithPassword("postgres")
@@ -30,36 +28,54 @@ namespace SecureAuth.IntegrationTests.Fixture
 
         public async Task InitializeAsync()
         {
+            // 🔹 Start container
             await _container.StartAsync();
 
+            // 🔹 Apply migrations FIRST (escopo isolado)
+            await using (var context = await DbContextFactory.CreateAsync(ConnectionString))
+            {
+                await context.Database.MigrateAsync();
+            }
+
+            // 🔹 Open persistent connection for Respawn
             _connection = new NpgsqlConnection(ConnectionString);
             await _connection.OpenAsync();
 
-            // 🔥 GARANTE QUE AS TABELAS EXISTEM
-            var context = await DbContextFactory.CreateAsync(ConnectionString);
-            await context.Database.MigrateAsync();
-
-            // 🔥 cria o Respawner (configuração importante)
+            // 🔹 Configure Respawner
             _respawner = await Respawner.CreateAsync(_connection, new RespawnerOptions
             {
                 DbAdapter = DbAdapter.Postgres,
 
-                // ignora tabelas de migrations do EF
+                SchemasToInclude = new[] { "public" },
+
                 TablesToIgnore = new Table[]
-                    {
-                        new Table("__EFMigrationsHistory", "public")
-                    }
+                {
+                    new Table("__EFMigrationsHistory", "public")
+                }
             });
         }
 
         public async Task ResetDatabaseAsync()
         {
+            if (_respawner is null)
+                throw new InvalidOperationException("Respawner is not initialized.");
+
+            if (_connection is null)
+                throw new InvalidOperationException("Database connection is not initialized.");
+
             await _respawner.ResetAsync(_connection);
         }
 
         public async Task DisposeAsync()
         {
-            await _connection.DisposeAsync();
+            if (_connection is not null)
+            {
+                await _connection.CloseAsync();
+                await _connection.DisposeAsync();
+            }
+
+            // 🔥 parada limpa do container
+            await _container.StopAsync();
             await _container.DisposeAsync();
         }
     }
