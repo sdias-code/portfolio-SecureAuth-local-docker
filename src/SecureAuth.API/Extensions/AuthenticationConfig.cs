@@ -53,17 +53,7 @@ public static class AuthenticationConfig
                 {
                     // Aqui você pode logar erro de token inválido
                     return Task.CompletedTask;
-                },
-                OnTokenValidated = context =>
-                {
-                    // Aqui você garante que config está correta em runtime
-                    if (string.IsNullOrEmpty(key) || key.Length < 32)
-                    {
-                        context.Fail("JWT Key inválida");
-                    }
-
-                    return Task.CompletedTask;
-                }
+                }                
             };
         });
 

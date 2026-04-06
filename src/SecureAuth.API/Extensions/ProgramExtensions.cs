@@ -52,9 +52,7 @@ public static class ProgramExtensions
         {
             app.UseHttpsRedirection();
         }
-
-        app.UseAuthentication();
-        app.UseAuthorization();
+        
         app.UseRateLimiter();
     }
 

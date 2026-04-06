@@ -21,6 +21,9 @@ public class JwtService : IJwtService
 
     public Task<string> GenerateToken(User user)
     {
+        // Debug: Verificar as configurações de JWT
+        Console.WriteLine(_jwtSettings.ExpirationMinutes);
+
         var key = _jwtSettings.Key
             ?? throw new BusinessException("JWT Key não configurada");
 
@@ -46,7 +49,7 @@ public class JwtService : IJwtService
             issuer: _jwtSettings.Issuer,
             audience: _jwtSettings.Audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiresInMinutes),
+            expires: DateTime.UtcNow.AddMinutes(_jwtSettings.ExpirationMinutes),
             signingCredentials: creds
         );
 

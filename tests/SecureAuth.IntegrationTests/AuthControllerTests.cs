@@ -99,6 +99,10 @@ namespace SecureAuth.IntegrationTests
 
             var loginResult = await login.Content.ReadFromJsonAsync<AuthResponse>();
 
+            // importante: imprimir o token para facilitar debug em caso de falha
+            var token = loginResult!.Token;
+            Console.WriteLine(token);
+
             var refresh = await _client.PostAsJsonAsync("/api/auth/refresh", new RefreshTokenRequest(loginResult!.RefreshToken));
 
             refresh.EnsureSuccessStatusCode();
@@ -128,6 +132,10 @@ namespace SecureAuth.IntegrationTests
 
             var loginResult = await login.Content.ReadFromJsonAsync<AuthResponse>();
 
+            // importante: imprimir o token para facilitar debug em caso de falha
+            var token = loginResult!.Token;
+            Console.WriteLine(token);
+
             var logout = await _client.PostAsJsonAsync("/api/auth/logout", new LogoutRequest(loginResult!.RefreshToken, false));
 
             logout.EnsureSuccessStatusCode();
@@ -151,6 +159,10 @@ namespace SecureAuth.IntegrationTests
             });
 
             var loginResult = await login.Content.ReadFromJsonAsync<AuthResponse>();
+
+            // importante: imprimir o token para facilitar debug em caso de falha
+            var token = loginResult!.Token;
+            Console.WriteLine(token);
 
             _client.DefaultRequestHeaders.Authorization =
                 new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", loginResult!.Token);
