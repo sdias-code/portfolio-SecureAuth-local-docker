@@ -12,10 +12,9 @@ public static class AuthenticationConfig
         var issuer = config["Jwt:Issuer"];
         var audience = config["Jwt:Audience"];
 
-        // ⚠️ NÃO lança exception aqui
+        // 🔐 fallback seguro (design-time / testes)
         if (string.IsNullOrEmpty(key))
         {
-            // fallback seguro para design-time (migrations)
             key = "development_super_secret_key_1234567890";
         }
 
@@ -28,13 +27,14 @@ public static class AuthenticationConfig
         })
         .AddJwtBearer(options =>
         {
-            options.RequireHttpsMetadata = false; // true em produção
+            options.RequireHttpsMetadata = false; // 🔒 true em produção
             options.SaveToken = true;
 
             options.TokenValidationParameters = new TokenValidationParameters
             {
-                ValidateIssuer = !string.IsNullOrEmpty(issuer),
-                ValidateAudience = !string.IsNullOrEmpty(audience),
+                // 🔥 VALIDAÇÕES CONTROLADAS (funciona em produção e testes)
+                ValidateIssuer = !string.IsNullOrWhiteSpace(issuer),
+                ValidateAudience = !string.IsNullOrWhiteSpace(audience),
                 ValidateIssuerSigningKey = true,
                 ValidateLifetime = true,
 
@@ -46,14 +46,26 @@ public static class AuthenticationConfig
                 ClockSkew = TimeSpan.Zero
             };
 
-            // 🔥 VALIDAÇÃO REAL ACONTECE AQUI
             options.Events = new JwtBearerEvents
             {
                 OnAuthenticationFailed = context =>
                 {
-                    // Aqui você pode logar erro de token inválido
+                    Console.WriteLine($"❌ JWT Auth failed: {context.Exception.Message}");
                     return Task.CompletedTask;
-                }                
+                },
+
+                OnTokenValidated = context =>
+                {
+                    // 🔥 validação extra de segurança (opcional mas profissional)
+                    var claimsIdentity = context.Principal?.Identity as System.Security.Claims.ClaimsIdentity;
+
+                    if (claimsIdentity == null || !claimsIdentity.Claims.Any())
+                    {
+                        context.Fail("Token sem claims válidas");
+                    }
+
+                    return Task.CompletedTask;
+                }
             };
         });
 
