@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SecureAuth.Application.Common.Settings;
 using SecureAuth.Infrastructure.Persistence;
 
 public class CustomWebApplicationFactory
@@ -19,29 +19,40 @@ public class CustomWebApplicationFactory
     {
         builder.UseEnvironment("Testing");
 
-        builder.ConfigureAppConfiguration((context, config) =>
-        {
-            var settings = new Dictionary<string, string?>
-            {
-                ["Jwt:Key"] = "super-secret-key-test-123456789123456789",
-                ["Jwt:Issuer"] = "TestIssuer",
-                ["Jwt:Audience"] = "TestAudience",
-                ["Jwt:ExpiresInMinutes"] = "60"
-            };
-
-            config.AddInMemoryCollection(settings!);
-        });
+        // 🔐 JWT Key com fallback seguro
+        var key = Environment.GetEnvironmentVariable("JWT__KEY")
+            ?? "super-secret-key-test-123456789123456789";
 
         builder.ConfigureServices(services =>
         {
-            var descriptor = services.SingleOrDefault(
-                d => d.ServiceType == typeof(DbContextOptions<AppDbContext>));
+            // 🔥 Remove TODAS as configurações anteriores do DbContext
+            var descriptors = services
+                .Where(d => d.ServiceType == typeof(DbContextOptions<AppDbContext>))
+                .ToList();
 
-            if (descriptor != null)
+            foreach (var descriptor in descriptors)
                 services.Remove(descriptor);
 
+            // 🔹 Injeta banco do Testcontainers
             services.AddDbContext<AppDbContext>(options =>
                 options.UseNpgsql(_connectionString));
+
+            // 🔥 FORÇA configurações JWT
+            services.Configure<JwtSettings>(options =>
+            {
+                options.Key = key;
+                options.Issuer = "TestIssuer";
+                options.Audience = "TestAudience";
+                options.ExpirationMinutes = 60;
+            });
+
+            // 🔥 Garante que o banco está pronto (evita race conditions)
+            var sp = services.BuildServiceProvider();
+
+            using var scope = sp.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+            db.Database.EnsureCreated();
         });
     }
 }
