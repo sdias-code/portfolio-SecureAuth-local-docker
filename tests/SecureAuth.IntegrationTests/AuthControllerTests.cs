@@ -162,10 +162,7 @@ namespace SecureAuth.IntegrationTests
 
             loginResponse.EnsureSuccessStatusCode();
 
-            var raw = await loginResponse.Content.ReadAsStringAsync();
-
-            Console.WriteLine("RAW RESPONSE:");
-            Console.WriteLine(raw);
+            var raw = await loginResponse.Content.ReadAsStringAsync();            
 
             var loginResult = JsonSerializer.Deserialize<AuthResponse>(
                 raw,
@@ -173,10 +170,7 @@ namespace SecureAuth.IntegrationTests
             );
 
             loginResult.Should().NotBeNull();
-            loginResult!.Token.Should().NotBeNullOrEmpty();
-
-            Console.WriteLine($"TOKEN: {loginResult.Token}");
-            Console.WriteLine($"REFRESH: {loginResult.RefreshToken}");
+            loginResult!.Token.Should().NotBeNullOrEmpty();            
 
             // 🔥 VALIDA formato JWT
             loginResult.Token.Should().Contain(".");
@@ -188,10 +182,7 @@ namespace SecureAuth.IntegrationTests
 
             if (!response.IsSuccessStatusCode)
             {
-                var error = await response.Content.ReadAsStringAsync();
-                Console.WriteLine("========== RESPONSE ERROR ==========");
-                Console.WriteLine(error);
-                Console.WriteLine("===================================");
+                var error = await response.Content.ReadAsStringAsync();                
             }
 
             response.EnsureSuccessStatusCode();

@@ -20,13 +20,7 @@ public class JwtService : IJwtService
     }
 
     public Task<string> GenerateToken(User user)
-    {
-        // Debug: Verificar as configurações de JWT
-        Console.WriteLine("JWT Configurações: _jwtSettings.ExpirationMinutes");
-        Console.WriteLine(_jwtSettings.ExpirationMinutes);
-        Console.WriteLine("JWT Configurações: _jwtSettings.Key.Length");
-        Console.WriteLine(_jwtSettings.Key.Length);
-
+    { 
         var key = _jwtSettings.Key
             ?? throw new BusinessException("JWT Key não configurada");
 
