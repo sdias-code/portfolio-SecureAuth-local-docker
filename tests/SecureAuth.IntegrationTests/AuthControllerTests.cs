@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using FluentAssertions;
 using SecureAuth.Application.Auth.DTOs;
@@ -144,31 +145,65 @@ namespace SecureAuth.IntegrationTests
         [Fact]
         public async Task Me_ShouldReturnUser_WhenAuthenticated()
         {
+            // Arrange
             await _fixture.ResetDatabaseAsync();
 
-            await _client.PostAsJsonAsync("/api/auth/register", new RegisterRequest
+            var email = "test@test.com";
+            var password = "123456";
+
+            // 🔹 Register
+            var registerResponse = await _client.PostAsJsonAsync("/api/auth/register", new RegisterRequest
             {
-                Email = "test@test.com",
-                Password = "123456"
+                Email = email,
+                Password = password
             });
 
-            var login = await _client.PostAsJsonAsync("/api/auth/login", new LoginRequest
+            registerResponse.EnsureSuccessStatusCode();
+
+            // 🔹 Login
+            var loginResponse = await _client.PostAsJsonAsync("/api/auth/login", new LoginRequest
             {
-                Email = "test@test.com",
-                Password = "123456"
+                Email = email,
+                Password = password
             });
 
-            var loginResult = await login.Content.ReadFromJsonAsync<AuthResponse>();
+            // 🔥 garante que login NÃO falhou silenciosamente
+            loginResponse.EnsureSuccessStatusCode();
 
-            // importante: imprimir o token para facilitar debug em caso de falha
-            var token = loginResult!.Token;
-            Console.WriteLine(token);
+            var loginResult = await loginResponse.Content.ReadFromJsonAsync<AuthResponse>();
 
+            // 🔥 valida retorno
+            loginResult.Should().NotBeNull();
+            loginResult!.Token.Should().NotBeNullOrEmpty();
+
+            // 🔥 DEBUG FORTE (CI friendly)
+            Console.WriteLine("========== TOKEN DEBUG ==========");
+            Console.WriteLine(loginResult.Token);
+            Console.WriteLine($"Length: {loginResult.Token.Length}");
+            Console.WriteLine($"Has dots: {loginResult.Token.Count(c => c == '.')}");
+            Console.WriteLine("=================================");
+
+            // 🔥 garante formato JWT válido
+            loginResult.Token.Count(c => c == '.').Should().Be(2, "Token JWT deve ter 3 partes");
+
+            // 🔹 Auth header
             _client.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", loginResult!.Token);
+                new AuthenticationHeaderValue("Bearer", loginResult.Token);
 
+            // Act
             var response = await _client.GetAsync("/api/auth/me");
 
+            // 🔥 debug se falhar
+            if (!response.IsSuccessStatusCode)
+            {
+                var body = await response.Content.ReadAsStringAsync();
+                Console.WriteLine("========== RESPONSE ERROR ==========");
+                Console.WriteLine(body);
+                Console.WriteLine($"Status: {response.StatusCode}");
+                Console.WriteLine("===================================");
+            }
+
+            // Assert
             response.EnsureSuccessStatusCode();
         }
 
