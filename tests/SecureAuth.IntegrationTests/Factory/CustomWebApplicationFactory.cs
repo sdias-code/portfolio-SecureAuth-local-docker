@@ -23,7 +23,7 @@ public class CustomWebApplicationFactory
         {
             var settings = new Dictionary<string, string?>
             {
-                ["Jwt:Key"] = "super-secret-key-test-123456789",
+                ["Jwt:Key"] = "super-secret-key-test-123456789123456789",
                 ["Jwt:Issuer"] = "TestIssuer",
                 ["Jwt:Audience"] = "TestAudience",
                 ["Jwt:ExpiresInMinutes"] = "60"
